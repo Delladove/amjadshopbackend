@@ -34,10 +34,10 @@ router.get("/", async (req, res) => {
       paymentMethods: DEFAULT_PAYMENT_METHODS,
       paymentMethodImgs: await getSetting("payment_method_imgs", {}),
       business: {
-        name: process.env.BUSINESS_NAME || "Amjad Magic Center",
+        name: process.env.BUSINESS_NAME ,
         address:
-          process.env.BUSINESS_ADDRESS || "Shah Alam Market Lahore",
-        phone: process.env.BUSINESS_PHONE || "03008838824",
+          process.env.BUSINESS_ADDRESS,
+        phone: process.env.BUSINESS_PHONE ,
       },
     });
   } catch (err) {

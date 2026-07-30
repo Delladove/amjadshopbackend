@@ -46,7 +46,7 @@ app.use((err, req, res, next) => {
 
 async function startServer() {
   await connectDB();
-  const PORT = process.env.PORT;
+  const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => {
     console.log(`AMJC Wholesale API running on http://localhost:${PORT}`);
   });
