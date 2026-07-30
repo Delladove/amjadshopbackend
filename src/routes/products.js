@@ -134,6 +134,7 @@ router.get("/barcode/:code", async (req, res) => {
 
 // POST /api/products
 router.post("/", async (req, res) => {
+  // console.log("Received request to create product:", req.body);
   try {
     const {
       catId,
@@ -158,7 +159,8 @@ router.post("/", async (req, res) => {
 
     const id = "p" + nanoid();
 
-    const barcode = generateBarcode();
+    const barcode = await generateBarcode();
+    // console.log("Generated barcode:", barcode);
 
     const imgList =
       Array.isArray(imgs) && imgs.length

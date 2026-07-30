@@ -43,6 +43,13 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: err.message || "Server error" });
 });
+/// Added a simple root route to confirm the server is running
+const router = express.Router();
+router.get("/", (req, res) => {
+  res.json({ message: "AMJC Wholesale API is running" });
+});
+app.use("/", router);
+
 
 async function startServer() {
   await connectDB();

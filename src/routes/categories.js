@@ -87,8 +87,9 @@ router.get("/:id", async (req, res) => {
 // POST /api/categories
 router.post("/", async (req, res) => {
   try {
-    const { name } = req.body;
 
+    const { name } = req.body;
+    console.log("Creating category with name:", name);
     if (!name || !name.trim())
       return res.status(400).json({
         error: "name is required",

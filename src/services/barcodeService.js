@@ -1,4 +1,5 @@
-const db = require("../db-old/db");
+const db = require("../db/db");
+const Setting = require("../models/Settings")
 
 /* Every product gets a unique, scannable EAN-13 barcode the moment it's created.
    We use the "20"-"29" prefix range, which is the GS1-reserved block for in-store /
@@ -16,18 +17,43 @@ function ean13CheckDigit(digits12) {
   return (10 - (sum % 10)) % 10;
 }
 
-function getNextSeq() {
-  const row = db.prepare("SELECT value FROM settings WHERE key = 'next_barcode_seq'").get();
-  const current = row ? parseInt(row.value, 10) : 1;
-  db.prepare(
-    "INSERT INTO settings (key, value) VALUES ('next_barcode_seq', ?) " +
-      "ON CONFLICT(key) DO UPDATE SET value = excluded.value"
-  ).run(String(current + 1));
-  return current;
+
+// async function getNextSeq() {
+//   const setting = await Setting.findOneAndUpdate(
+//     { key: "next_barcode_seq" },
+//     {
+//       $setOnInsert: { value: 150 },
+//       $inc: { value: 1 },
+//     },
+//     {
+//       upsert: true,
+//       returnDocument: "after",
+//     }
+//   );
+
+//   return setting.value - 1;
+// }
+
+async function getNextSeq() {
+  const setting = await Setting.findOneAndUpdate(
+    { key: "next_barcode_seq" },
+    {
+      $inc: { value: 1 },
+    },
+    {
+      returnDocument: "after",
+    }
+  );
+
+  if (!setting) {
+    throw new Error("Setting 'next_barcode_seq' not found");
+  }
+  // console.log("Next barcode sequence:", setting.value);
+  return setting.value;
 }
 
-function generateBarcode() {
-  const seq = getNextSeq();
+async function generateBarcode() {
+  const seq = await getNextSeq();
   const core = "20" + String(seq).padStart(10, "0"); // 12 digits total
   return core + ean13CheckDigit(core);
 }
