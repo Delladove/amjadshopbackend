@@ -92,20 +92,27 @@ router.get("/product/:id", async (req, res) => {
 <meta name="twitter:title" content="${p.titleEn}">
 <meta name="twitter:description" content="Price: Rs. ${p.unitPrice}">
 <meta name="twitter:image" content="${p.img}">
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    html, body{
+        width: 100%;
+        min-height: 100vh;
+    }
+</style>
 </head>
-
-<body style="font-family:Arial;padding:30px">
-
-<h1>${p.titleEn}</h1>
-<h2>${p.titleUr}</h2>
-
-<img src="${p.img}" width="350">
-
+<body style="overflow-x: hidden; font-family:Arial;padding: 20px 0; display: flex; justify-content: center; align-items: center;  background-image: linear-gradient(135deg, rgb(255, 68, 56) 0%, rgb(230, 35, 30) 55%, rgb(183, 20, 20) 100%); background-repeat: no-repeat;">
+<div style="background-color: #fbf6f2; display: flex; flex-direction: column; gap: 10px; border-radius: 16px; width: 300px; padding:16px">
+<h2>${p.titleEn}</h2>
+<h3 style="text-align: right;">${p.titleUr}</h3>
+<div style="background-color: #fde1df; display: flex; justify-content: center; border-radius: 16px;">
+    <img src="${p.img}" width="100%" style="border-radius: 16px;">
+</div>
 <p><strong>Price:</strong> Rs. ${p.unitPrice}</p>
 <p><strong>Barcode:</strong> ${p.barcode}</p>
-
-
-
+</div>
 </body>
 </html>
 `);
