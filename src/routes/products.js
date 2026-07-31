@@ -86,7 +86,7 @@ router.get("/product/:id", async (req, res) => {
 <meta property="og:title" content="${p.titleEn}">
 <meta property="og:description" content="Price: Rs. ${p.unitPrice}">
 <meta property="og:image" content="${p.img}">
-<meta property="og:url" content="https://yourdomain.com/product/${p.id}">
+<meta property="og:url" content="${process.env.CORS_ORIGIN}/customer">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${p.titleEn}">
