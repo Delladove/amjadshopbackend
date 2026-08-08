@@ -1,7 +1,6 @@
 const userSchema = require("../models/User");
 const express = require("express");
 const bcrypt = require('bcrypt');
-const jose = require('jose');
 const cookieParser = require("cookie-parser");
 const router = express.Router();
 router.use(cookieParser());
@@ -10,6 +9,7 @@ router.use(cookieParser());
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-32-character-secret-key-here');
 
 router.post('/', async (req, res) => {
+   const { SignJWT } = await import('jose');
   console.log("in login");
   const { userRole, userPassword } = req.body; // "admin" or "warehouse"
 
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     }
 
     // 4. Create the JWT (Using role instead of userId)
-    const token = await new jose.SignJWT({ role: userRole }) // 🔑 Role goes here
+    const token = await new SignJWT({ role: userRole }) // 🔑 Role goes here
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('3d')
@@ -76,6 +76,7 @@ router.post('/', async (req, res) => {
 
 // 4. VERIFICATION ROUTE: Check cookie when React page reloads
 router.get('/me', async (req, res) => {
+  const { jwtVerify } = await import('jose');
   const token = req.cookies.jwt_token;
 
   if (!token) {
@@ -84,7 +85,7 @@ router.get('/me', async (req, res) => {
 
   try {
     // Verify the JWT using jose
-    const { payload } = await jose.jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, JWT_SECRET);
 
     // Token is valid! Return user data to populate React Context
     return res.status(200).json({
