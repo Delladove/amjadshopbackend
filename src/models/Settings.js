@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 
 const settingSchema = new mongoose.Schema(
 {
-    _id: String,
-
     key: {
         type: String,
         unique: true

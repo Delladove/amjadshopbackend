@@ -35,25 +35,29 @@ function ean13CheckDigit(digits12) {
 // }
 
 async function getNextSeq() {
-  const setting = await Setting.findOneAndUpdate(
-    { key: "next_barcode_seq" },
-    {
-      $inc: { value: 1 },
-    },
-    {
-      returnDocument: "after",
-    }
-  );
+  let setting = await Setting.findOne({ key: "next_barcode_seq" });
 
   if (!setting) {
-    throw new Error("Setting 'next_barcode_seq' not found");
+    console.log("new doc created next_barcode_seq")
+    await Setting.create({
+      key: "next_barcode_seq",
+      value: 4,
+    });
+    return 4;
   }
-  // console.log("Next barcode sequence:", setting.value);
+
+  setting = await Setting.findOneAndUpdate(
+    { key: "next_barcode_seq" },
+    { $inc: { value: 1 } },
+    { returnDocument: "after" }
+  );
+
   return setting.value;
 }
 
 async function generateBarcode() {
   const seq = await getNextSeq();
+  console.log("sq from db", seq);
   const core = "20" + String(seq).padStart(10, "0"); // 12 digits total
   return core + ean13CheckDigit(core);
 }

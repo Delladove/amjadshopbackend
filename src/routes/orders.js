@@ -251,9 +251,11 @@ router.post("/", async (req, res) => {
 });
 
 
+
 // PUT /api/orders/:id
 router.put("/:id", async (req, res) => {
   try {
+    console.log("PUT /api/orders/:id", req.body);
     const order = await Order.findById(req.params.id);
 
     if (!order)
@@ -274,55 +276,60 @@ router.put("/:id", async (req, res) => {
       city,
     } = req.body;
 
-    if (!Array.isArray(items))
-      return res
-        .status(400)
-        .json({ error: "items array is required" });
+    if (!items && !discount && !cargo && !notes && !phone && !city) {
+       console.log("in whatsapp user");
+       order.customer = customer?.trim() || order.customer;
+    }
+    else {
+      if (!Array.isArray(items))
+        return res
+          .status(400)
+          .json({ error: "items array is required" });
 
-    const lineItems = items.map((i) => ({
-      id: i.id || "item" + nanoid(),
-      product_id: i.productId || null,
-      title_en: i.titleEn,
-      title_ur: i.titleUr || "",
-      qty: Number(i.qty) || 1,
-      unit_price: Number(i.unitPrice) || 0,
-      custom:
-        i.custom != null && i.custom !== ""
-          ? Number(i.custom)
-          : null,
-      line_total:
-        i.custom != null && i.custom !== ""
-          ? Number(i.custom)
-          : Number(i.qty) * Number(i.unitPrice),
-    }));
+      const lineItems = items.map((i) => ({
+        id: i.id || "item" + nanoid(),
+        product_id: i.productId || null,
+        title_en: i.titleEn,
+        title_ur: i.titleUr || "",
+        qty: Number(i.qty) || 1,
+        unit_price: Number(i.unitPrice) || 0,
+        custom:
+          i.custom != null && i.custom !== ""
+            ? Number(i.custom)
+            : null,
+        line_total:
+          i.custom != null && i.custom !== ""
+            ? Number(i.custom)
+            : Number(i.qty) * Number(i.unitPrice),
+      }));
 
-    const subtotal = computeSubtotal(
-      lineItems.map((i) => ({
-        qty: i.qty,
-        unit_price: i.unit_price,
-        custom: i.custom,
-      }))
-    );
+      const subtotal = computeSubtotal(
+        lineItems.map((i) => ({
+          qty: i.qty,
+          unit_price: i.unit_price,
+          custom: i.custom,
+        }))
+      );
 
-    const disc = Math.max(0, Number(discount) || 0);
-    const total = computeTotal(subtotal, disc);
+      const disc = Math.max(0, Number(discount) || 0);
+      const total = computeTotal(subtotal, disc);
 
-    order.items = lineItems;
+      order.items = lineItems;
 
-    order.subtotal = subtotal;
-    order.discount = disc;
-    order.total = total;
+      order.subtotal = subtotal;
+      order.discount = disc;
+      order.total = total;
 
-    if (cargo !== undefined)
-      order.cargo = cargo;
+      if (cargo !== undefined)
+        order.cargo = cargo;
 
-    order.notes = notes ?? order.notes;
-    order.customer = customer?.trim() || order.customer;
-    order.phone = phone ?? order.phone;
-    order.city = city ?? order.city;
+      order.notes = notes ?? order.notes;
+      order.customer = customer?.trim() || order.customer;
+      order.phone = phone ?? order.phone;
+      order.city = city ?? order.city;
+    }
 
     order.updated_at = Date.now();
-
     await order.save();
 
     res.json(await getFullOrder(req.params.id));

@@ -141,7 +141,7 @@ router.get("/barcode/:code", async (req, res) => {
 
 // POST /api/products
 router.post("/", async (req, res) => {
-  // console.log("Received request to create product:", req.body);
+  console.log("Received request to create product:", req.body);
   try {
     const {
       catId,
@@ -151,13 +151,14 @@ router.post("/", async (req, res) => {
       img,
       imgs,
     } = req.body;
-
+    // console.log(req.body);
     if (!catId || !titleEn)
       return res.status(400).json({
         error: "catId and titleEn are required",
       });
 
     const cat = await Category.findById(catId);
+    // console.log("cat",cat);
 
     if (!cat)
       return res.status(400).json({
@@ -165,6 +166,8 @@ router.post("/", async (req, res) => {
       });
 
     const id = "p" + nanoid();
+    // console.log("Generated id:", id);
+  
 
     const barcode = await generateBarcode();
     // console.log("Generated barcode:", barcode);
@@ -189,7 +192,7 @@ router.post("/", async (req, res) => {
       share_count: 0,
       created_at: Date.now(),
     });
-
+    console.log(product)
     res.status(201).json(toApi(product));
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -47,7 +47,10 @@ const orderItemSchema = new mongoose.Schema(
 
     unit_price: Number,
 
-    custom: Number,
+    custom:{
+        type: Number,
+        default: null
+    },
 
     line_total: Number
 },
