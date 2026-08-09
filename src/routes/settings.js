@@ -20,7 +20,7 @@ async function setSetting(key, value) {
     { value },
     {
       upsert: true,
-      new: true,
+      returnDocument: "after",
       setDefaultsOnInsert: true,
     }
   );
