@@ -44,6 +44,10 @@ const orderItemSchema = new mongoose.Schema(
         type: Number,
         default: 1
     },
+    packed_qty:{
+        type: Number,
+        default: 0
+    },
 
     unit_price: Number,
 
@@ -62,6 +66,11 @@ const orderItemSchema = new mongoose.Schema(
 const orderSchema = new mongoose.Schema(
 {
     _id: String,
+    bill_no:{
+        type: String,
+        unique: true,
+        required: true
+    },
 
     bill_type: {
         type: String,
@@ -137,15 +146,4 @@ orderSchema.index({ status: 1 });
 orderSchema.index({ bill_type: 1 });
 orderSchema.index({ updated_at: -1 });
 
-orderSchema.virtual("id").get(function () {
-    return this._id;
-});
-
-orderSchema.set("toJSON", {
-  virtuals: true,
-});
-
-orderSchema.set("toObject", {
-  virtuals: true,
-});
 module.exports = mongoose.model("Order", orderSchema);

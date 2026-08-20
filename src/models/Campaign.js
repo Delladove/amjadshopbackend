@@ -16,15 +16,15 @@ const campaignSchema = new mongoose.Schema(
     versionKey: false
 });
 
-campaignSchema.virtual("id").get(function () {
-    return this._id;
-});
+// campaignSchema.virtual("id").get(function () {
+//     return this._id;
+// });
 
-campaignSchema.set("toJSON", {
-  virtuals: true,
-});
+// campaignSchema.set("toJSON", {
+//   virtuals: true,
+// });
 
-campaignSchema.set("toObject", {
-  virtuals: true,
-});
+// campaignSchema.set("toObject", {
+//   virtuals: true,
+// });
 module.exports = mongoose.model("Campaign", campaignSchema);

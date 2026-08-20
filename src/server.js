@@ -17,7 +17,9 @@ const uploadsRoutes = require("./routes/uploads");
 const visitsRoutes = require("./routes/visits");
 const loginRoutes = require("./routes/login");
 const passwordResetRoutes = require("./routes/passwordreset");
-const whatsappRoutes = require("./routes/whatsapp");
+const HomeRoutes = require("./routes/home")
+// const whatsappRoutes = require("./routes/whatsapp");
+
 
 
 
@@ -47,7 +49,7 @@ app.use("/api/uploads", uploadsRoutes);
 app.use("/api/visits", visitsRoutes);
 app.use("/api/login", loginRoutes);
 app.use("/api/password-reset", passwordResetRoutes);
-app.use("/", whatsappRoutes);
+app.use("/", HomeRoutes);
 // centralized error handler — keeps every route's try/catch simple
 app.use((err, req, res, next) => {
   console.error(err);

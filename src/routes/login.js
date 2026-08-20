@@ -112,7 +112,7 @@ router.post('/logout', (req, res) => {
 router.get("/get-warehouse", async (req, res) => {
   try {
     const authDoc = await userSchema.findById("auth");
-    console.log("in get-warehouse",authDoc)
+    // console.log("in get-warehouse",authDoc)
 
     if (!authDoc) {
       return res.status(500).json({ message: 'Auth configuration missing' });
@@ -132,7 +132,7 @@ router.get("/get-warehouse", async (req, res) => {
 router.post("/set-warehouse", async (req, res) => {
   try {
     const { newValue } = req.body;
-    console.log("in set warehouse", newValue);
+    // console.log("in set warehouse", newValue);
     await userSchema.updateOne(
       { _id: "auth" },
       { warehouseDisabled: newValue }

@@ -13,15 +13,15 @@ const settingSchema = new mongoose.Schema(
     versionKey: false
 });
 
-settingSchema.virtual("id").get(function () {
-    return this._id;
-});
+// settingSchema.virtual("id").get(function () {
+//     return this._id;
+// });
 
-settingSchema.set("toJSON", {
-  virtuals: true,
-});
+// settingSchema.set("toJSON", {
+//   virtuals: true,
+// });
 
-settingSchema.set("toObject", {
-  virtuals: true,
-});
+// settingSchema.set("toObject", {
+//   virtuals: true,
+// });
 module.exports = mongoose.model("Setting", settingSchema);

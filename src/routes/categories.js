@@ -35,9 +35,11 @@ router.get("/", async (req, res) => {
               cat_id: cat._id,
             }),
           ]);
-
+        console.log({...cat.toObject()})
         return {
-          ...cat.toObject(),
+          id: cat._id,
+          name: cat.name,
+          link_slug: cat.link_slug,
           product_count: productCount,
           shared_count: sharedCount,
           campaign_count: campaignCount,
@@ -74,7 +76,9 @@ router.get("/:id", async (req, res) => {
       ]);
 
     res.json({
-      ...cat.toObject(),
+      id: cat._id,
+      name: cat.name,
+      link_slug: cat.link_slug,
       product_count: productCount,
       shared_count: sharedCount,
       campaign_count: campaignCount,

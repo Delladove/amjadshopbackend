@@ -10,6 +10,7 @@ const { generateBarcode } = require("../services/barcodeService");
 const router = express.Router();
 
 function toApi(doc) {
+  // console.log("doc", doc)
   return {
     id: doc._id,
     catId: doc.cat_id,
@@ -24,6 +25,97 @@ function toApi(doc) {
     createdAt: doc.created_at,
   };
 }
+
+//GET /api/products/shared?limit=&cursor=
+router.get("/shared", async (req, res) => {
+  try {
+    console.log("Loaded ",Number(req.query.limit))
+    const limit = Math.min(
+      Number(req.query.limit) || 20,
+      50
+    );
+
+    const filter = {
+      shared: true,
+      shared_at: { $ne: null }
+    };
+
+    console.log("cursor", req.query.cursor)
+    // Read cursor
+    if (req.query.cursor) {
+      console.log("inside cursor");
+      try {
+        const decoded = JSON.parse(
+          Buffer.from(
+            req.query.cursor,
+            "base64url"
+          ).toString()
+        );
+
+        const { sharedAt, id } = decoded;
+
+        filter.$or = [
+          {
+            shared_at: {
+              $lt: Number(sharedAt)
+            }
+          },
+          {
+            shared_at: Number(sharedAt),
+            _id: {
+              $lt: id
+            }
+          }
+        ];
+      } catch {
+        return res.status(400).json({
+          message: "Invalid cursor"
+        });
+      }
+    }
+
+    const products = await Product.find(filter)
+      .sort({
+        shared_at: -1,
+        _id: -1
+      })
+      .limit(limit + 1)
+      .lean();
+    console.log("products",products.length);
+    const hasMore = products.length > limit;
+
+    if (hasMore) {
+      products.pop();
+    }
+
+    let nextCursor = null;
+
+    if (hasMore && products.length > 0) {
+      const lastProduct =
+        products[products.length - 1];
+
+      nextCursor = Buffer.from(
+        JSON.stringify({
+          sharedAt: lastProduct.shared_at,
+          id: lastProduct._id
+        })
+      ).toString("base64url");
+    }
+    const transformed_products = products.map(toApi);
+    // console.log(transformed_products)
+   res.json({
+        products: transformed_products,
+        nextCursor,
+        hasMore
+      });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch shared products"
+    });
+  }
+});
 
 // GET /api/products?catId=&q=
 router.get("/", async (req, res) => {
@@ -53,7 +145,7 @@ router.get("/", async (req, res) => {
 // GET /api/products/:id
 router.get("/:id", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).lean();
 
     if (!product)
       return res.status(404).json({ error: "Product not found" });
@@ -64,62 +156,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Product preview page
-router.get("/product/:id", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product)
-      return res.status(404).send("Product not found");
-
-    const p = toApi(product);
-
-    res.send(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-
-<title>${p.titleEn}</title>
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="${p.titleEn}">
-<meta property="og:description" content="Price: Rs. ${p.unitPrice}">
-<meta property="og:image" content="${p.img}">
-<meta property="og:url" content="${process.env.CORS_ORIGIN}/customer">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${p.titleEn}">
-<meta name="twitter:description" content="Price: Rs. ${p.unitPrice}">
-<meta name="twitter:image" content="${p.img}">
-<style>
-    *{
-        margin: 0;
-        padding: 0;
-    }
-    html, body{
-        width: 100%;
-        min-height: 100vh;
-    }
-</style>
-</head>
-<body style="overflow-x: hidden; font-family:Arial;padding: 20px 0; display: flex; justify-content: center; align-items: center;  background-image: linear-gradient(135deg, rgb(255, 68, 56) 0%, rgb(230, 35, 30) 55%, rgb(183, 20, 20) 100%); background-repeat: no-repeat;">
-<div style="background-color: #fbf6f2; display: flex; flex-direction: column; gap: 10px; border-radius: 16px; width: 300px; padding:16px">
-<h2>${p.titleEn}</h2>
-<h3 style="text-align: right;">${p.titleUr}</h3>
-<div style="background-color: #fde1df; display: flex; justify-content: center; border-radius: 16px;">
-    <img src="${p.img}" width="100%" style="border-radius: 16px;">
-</div>
-<p><strong>Price:</strong> Rs. ${p.unitPrice}</p>
-<p><strong>Barcode:</strong> ${p.barcode}</p>
-</div>
-</body>
-</html>
-`);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
 
 // GET /api/products/barcode/:code
 router.get("/barcode/:code", async (req, res) => {
@@ -249,7 +285,7 @@ router.post("/:id/share", async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       {
-        $set: { shared: true },
+        $set: { shared: true , shared_at: Date.now() },
         $inc: { share_count: 1 },
       },
       {

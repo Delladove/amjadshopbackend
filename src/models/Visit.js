@@ -19,15 +19,15 @@ const visitSchema = new mongoose.Schema(
 });
 
 
-visitSchema.virtual("id").get(function () {
-    return this._id;
-});
+// visitSchema.virtual("id").get(function () {
+//     return this._id;
+// });
 
-visitSchema.set("toJSON", {
-  virtuals: true,
-});
+// visitSchema.set("toJSON", {
+//   virtuals: true,
+// });
 
-visitSchema.set("toObject", {
-  virtuals: true,
-});
+// visitSchema.set("toObject", {
+//   virtuals: true,
+// });
 module.exports = mongoose.model("Visit", visitSchema);

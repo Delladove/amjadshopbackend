@@ -48,6 +48,12 @@ const productSchema = new mongoose.Schema(
         default: 0
     },
 
+    shared_at:{
+        type: Number,
+        default: null
+    },
+
+
     created_at: Number
 },
 {
@@ -55,17 +61,22 @@ const productSchema = new mongoose.Schema(
 });
 
 productSchema.index({ cat_id: 1 });
-// productSchema.index({ barcode: 1 });
-productSchema.virtual("id").get(function () {
-    return this._id;
-});
 
-productSchema.set("toJSON", {
-  virtuals: true,
+productSchema.index({
+  shared: 1,
+  shared_at: -1,
+  _id: -1
 });
+// productSchema.virtual("id").get(function () {
+//     return this._id;
+// });
+
+// productSchema.set("toJSON", {
+//   virtuals: true,
+// });
 
 
-productSchema.set("toObject", {
-  virtuals: true,
-});
+// productSchema.set("toObject", {
+//   virtuals: true,
+// });
 module.exports = mongoose.model("Product", productSchema);

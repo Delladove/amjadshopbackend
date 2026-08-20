@@ -18,15 +18,15 @@ const categorySchema = new mongoose.Schema(
     versionKey: false
 });
 
-categorySchema.virtual("id").get(function () {
-    return this._id;
-});
+// categorySchema.virtual("id").get(function () {
+//     return this._id;
+// });
 
-categorySchema.set("toJSON", {
-  virtuals: true,
-});
+// categorySchema.set("toJSON", {
+//   virtuals: true,
+// });
 
-categorySchema.set("toObject", {
-  virtuals: true,
-});
+// categorySchema.set("toObject", {
+//   virtuals: true,
+// });
 module.exports = mongoose.model("Category", categorySchema);
